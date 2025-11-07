@@ -77,6 +77,19 @@ sequenceDiagram
     ResourceServer-->>Client: 12. 200 OK + protected payload + X-PAYMENT-RESPONSE
 ```
 
+1. **Client requests the resource** – the paywall hits `/weather/premium` with no payment header yet.
+2. **Resource server challenges** – middleware returns `402 Payment Required` and includes the payment requirements payload.
+3. **User signs the payment** – the client prompts the wallet, which signs a Stellar payment transaction matching the requirements.
+4. **Client retries with `X-PAYMENT`** – the original request is retried, now including the base64-encoded `X-PAYMENT` header containing the signed transaction.
+5. **Server calls facilitator `/verify`** – middleware forwards the header + requirements so the facilitator can validate the transaction details.
+6. **Facilitator responds with verification** – it returns whether the transaction is valid (amount, asset, destination, time bounds, etc.). Failures stop here with another 402.
+7. **Server performs protected work** – assuming verification passed, the server generates or fetches the premium content.
+8. **Server calls facilitator `/settle`** – middleware asks the facilitator to settle the transaction.
+9. **Facilitator submits fee-bump transaction** – the facilitator wraps the user’s signed transaction in a fee-bump and sends it to Horizon, paying the fees via the sponsor account.
+10. **Ledger confirms submission** – Horizon (Stellar network) processes the fee-bump transaction and returns the result.
+11. **Facilitator returns settlement details** – it sends back the transaction hash, ledger, and success flag to the server.
+12. **Server responds to client** – the server returns `200 OK`, the protected resource payload, and an `X-PAYMENT-RESPONSE` header so the client can replay the payment if needed.
+
 ## Documentation & References
 
 - `docs/stellar_x402_runbook.md` – Operational guide covering setup, configuration, and troubleshooting.
