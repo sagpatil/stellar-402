@@ -14,9 +14,9 @@ A TypeScript SDK and React demo for building paywalls and micropayments using US
 
 ## Demo
 
- <video src="docs/resources/demo.mp4" controls style="max-width: 100%; border-radius: 12px;">
+ <video src="docs/resources/demo1.mp4" controls style="max-width: 100%; border-radius: 12px;">
      Your browser does not support the video tag. 
-     <a href="docs/resources/demo.mp4">Download the demo video</a>.
+     <a href="docs/resources/demo1.mp4">Download the demo video</a>.
    </video>
 
 
