@@ -10,7 +10,7 @@
     "test": "node test/run-tests.js",
     "dev": "tsc --watch",
     "demo": "vite demo --port 3001",
-    "mock:server": "node examples/mock-resource-server.js"
+    "verify:server": "node examples/verification-server.js"
   },
   "keywords": ["x402", "stellar", "payments"],
   "author": "Sagar Patel",

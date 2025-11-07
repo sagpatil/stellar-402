@@ -75,12 +75,12 @@ When the user clicks “Pay,” the paywall goes through the following TypeScrip
 After a successful payment, the demo shows the encoded header. To use it:
 
 1. Copy the full string (no whitespace changes).
-2. Replay the original HTTP request that returned `402 Payment Required`, adding the header. To try this locally, you can spin up the bundled mock server:
+2. Replay the original HTTP request that returned `402 Payment Required`, adding the header. To try this locally, you can spin up the bundled verification server:
 
    ```bash
    npm install          # install express dependency if needed
    npm run build        # produce dist/ artifacts for the SDK
-   npm run mock:server  # starts http://localhost:4020
+    npm run verify:server  # starts http://localhost:4020
 
    curl http://localhost:4020/premium-resource \
      -H "X-PAYMENT: <paste-header-here>"
@@ -105,7 +105,7 @@ After a successful payment, the demo shows the encoded header. To use it:
 
 ## Server-Side Verification Example
 
-See `examples/mock-resource-server.js` for a complete Express implementation that you can run locally—it decodes the header, hits Horizon, and returns a demo JSON payload when verification succeeds.
+See `examples/verification-server.js` for a complete Express implementation that you can run locally—it decodes the header, hits Horizon, and returns a demo JSON payload when verification succeeds.
 
 ## Frequently Asked Questions
 

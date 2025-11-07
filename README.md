@@ -14,11 +14,20 @@ A TypeScript SDK and React demo for building paywalls and micropayments using US
 
 ## Demo
 
- <video src="docs/resources/demo1.mp4" controls style="max-width: 100%; border-radius: 12px;">
-     Your browser does not support the video tag. 
-     <a href="docs/resources/demo1.mp4">Download the demo video</a>.
-   </video>
+<video src="docs/resources/demo1.mp4" controls style="max-width: 100%; border-radius: 12px;">
+  Your browser does not support the video tag.
+  <a href="docs/resources/demo1.mp4">Download the demo video</a>.
+</video>
 
+<p align="center">
+  <img src="docs/resources/1.png" alt="Locked premium content screen" width="420" />
+  <img src="docs/resources/2.png" alt="Payment required details" width="420" />
+  <br/>
+  <img src="docs/resources/3.png" alt="Wallet connected and ready to pay" width="420" />
+  <img src="docs/resources/4.png" alt="Freighter confirmation dialog" width="420" />
+  <br/>
+  <img src="docs/resources/5.png" alt="Payment success and header output" width="640" />
+</p>
 
 ## Quick Start
 
@@ -35,16 +44,16 @@ Open http://localhost:3001 to see the paywall demo.
 ### Verify the `X-PAYMENT` header locally
 
 ```bash
-npm install          # ensure express dependency is installed
-npm run build        # compile sdk into dist/
-npm run mock:server  # starts http://localhost:4020
+npm install           # ensure express dependency is installed
+npm run build         # compile sdk into dist/
+npm run verify:server # starts http://localhost:4020
 
-# After paying in the demo, copy the header and replay it against the mock
+# After paying in the demo, copy the header and replay it against the verification server
 curl http://localhost:4020/premium-resource \
   -H "X-PAYMENT: <paste-header-here>"
 ```
 
-The mock server lives at `examples/mock-resource-server.js` and mirrors how a resource server would decode, verify, and respond to the header.
+The verification server lives at `examples/verification-server.js` and mirrors how a resource server would decode, verify, and respond to the header.
 
 Example response:
 
