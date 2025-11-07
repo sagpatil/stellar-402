@@ -1,5 +1,5 @@
 /**
- * Core types for ClaudeX402 - Starting simple
+ * Core types for StellarX402 - Starting simple
  */
 export type StellarNetwork = 'mainnet' | 'testnet';
 export interface USDCConfig {

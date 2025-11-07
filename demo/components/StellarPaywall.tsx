@@ -6,14 +6,17 @@
 import React, { useState } from 'react';
 import { useStellarWalletKit } from '../hooks/useStellarWalletKit';
 import { WalletButton } from './WalletButton';
-import { 
-  getUSDCBalance, 
+import {
+  getUSDCBalance,
   buildPaymentTransaction,
   formatAmount,
-  type StellarNetwork 
-} from '../../src/index';
+  type StellarNetwork,
+  type StellarPaymentRequirement as StellarX402Requirement,
+  createStellarPaymentPayload,
+  encodeStellarPaymentHeader,
+} from '../../sdk/index';
 import { TransactionBuilder, Horizon } from '@stellar/stellar-sdk';
-import { getNetworkConfig } from '../../src/config';
+import { getNetworkConfig } from '../../sdk/config';
 
 export interface PaymentRequirement {
   network: StellarNetwork;
@@ -25,7 +28,7 @@ export interface PaymentRequirement {
 
 export interface StellarPaywallProps {
   requirement: PaymentRequirement;
-  onSuccess?: (txHash: string) => void;
+  onSuccess?: (txHash: string, paymentHeader?: string) => void;
   onError?: (error: Error) => void;
 }
 
@@ -38,6 +41,7 @@ export function StellarPaywall({ requirement, onSuccess, onError }: StellarPaywa
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('Click connect to choose a wallet');
+  const [paymentHeader, setPaymentHeader] = useState<string | null>(null);
   
   // For demo: use connected wallet as recipient (self-payment) to avoid trustline issues
   const actualRecipient = address || requirement.recipient;
@@ -94,6 +98,9 @@ export function StellarPaywall({ requirement, onSuccess, onError }: StellarPaywa
       return;
     }
 
+    setPaymentHeader(null);
+    setTxHash(null);
+
     try {
       // Step 1: Build transaction
       setStatus('building-tx');
@@ -124,12 +131,31 @@ export function StellarPaywall({ requirement, onSuccess, onError }: StellarPaywa
       
       // Get the transaction hash from the result
       const hash = submitResult.hash;
+
+      const ledger = submitResult.ledger ?? 0;
+      if (!ledger) {
+        throw new Error('Settlement response missing ledger number');
+      }
       
+      const x402Requirement = toX402Requirement(requirement, actualRecipient);
+      const payload = createStellarPaymentPayload({
+        requirement: x402Requirement,
+        proof: {
+          transactionHash: hash,
+          ledger,
+          memo: requirement.memo,
+          submittedAt: new Date().toISOString(),
+        },
+      });
+
+      const header = encodeStellarPaymentHeader(payload);
+
       setTxHash(hash);
+      setPaymentHeader(header);
       setStatus('success');
       
       if (onSuccess) {
-        onSuccess(hash);
+        onSuccess(hash, header);
       }
 
     } catch (err: any) {
@@ -286,6 +312,33 @@ export function StellarPaywall({ requirement, onSuccess, onError }: StellarPaywa
           >
             View on Explorer →
           </a>
+          {paymentHeader && (
+            <div className="payment-header">
+              <label htmlFor="stellar-x402-header">X-PAYMENT Header</label>
+              <textarea
+                id="stellar-x402-header"
+                value={paymentHeader}
+                readOnly
+                rows={3}
+                onFocus={(event) => event.currentTarget.select()}
+              />
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    navigator.clipboard.writeText(paymentHeader).catch(() => {
+                      setStatusMessage('Unable to copy header automatically');
+                    });
+                  } else {
+                    setStatusMessage('Clipboard API not available');
+                  }
+                }}
+              >
+                Copy Header
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -309,5 +362,49 @@ export function StellarPaywall({ requirement, onSuccess, onError }: StellarPaywa
       )}
     </div>
   );
+}
+
+function toX402Requirement(
+  requirement: PaymentRequirement,
+  payTo: string
+): StellarX402Requirement {
+  const config = getNetworkConfig(requirement.network);
+  const network = requirement.network === 'testnet' ? 'stellar-testnet' : 'stellar-mainnet';
+  const stroops = convertAmountToStroops(requirement.amount);
+
+  return {
+    scheme: 'exact',
+    network,
+    resource: resolveResourceUrl(),
+    description: requirement.description ?? 'Stellar x402 resource',
+    mimeType: 'application/json',
+    maxAmountRequired: stroops,
+    payTo,
+    maxTimeoutSeconds: 120,
+    asset: requirement.network === 'testnet'
+      ? `USDC:${config.usdc.issuer}`
+      : `USDC:${config.usdc.issuer}`,
+    extra: {
+      networkPassphrase: config.networkPassphrase,
+      memoHint: requirement.memo,
+    },
+  };
+}
+
+function convertAmountToStroops(amount: string): string {
+  const numeric = Number.parseFloat(amount);
+  if (!Number.isFinite(numeric)) {
+    throw new Error(`Invalid amount provided: ${amount}`);
+  }
+
+  return Math.round(numeric * 10_000_000).toString();
+}
+
+function resolveResourceUrl(): string {
+  if (typeof window !== 'undefined' && window.location) {
+    return window.location.href;
+  }
+
+  return 'https://stellarx402.local/resource';
 }
 

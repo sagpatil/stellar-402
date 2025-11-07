@@ -9,7 +9,8 @@
     "build:demo": "vite build demo",
     "test": "node test/run-tests.js",
     "dev": "tsc --watch",
-    "demo": "vite demo --port 3001"
+    "demo": "vite demo --port 3001",
+    "mock:server": "node examples/mock-resource-server.js"
   },
   "keywords": ["x402", "stellar", "payments"],
   "author": "Sagar Patel",
@@ -17,6 +18,7 @@
   "dependencies": {
     "@stellar/stellar-sdk": "^12.3.0",
     "@creit.tech/stellar-wallets-kit": "^1.0.0",
+    "express": "^4.19.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

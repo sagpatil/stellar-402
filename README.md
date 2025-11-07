@@ -24,11 +24,25 @@ npm run demo
 
 Open http://localhost:3001 to see the paywall demo.
 
+### Verify the `X-PAYMENT` header locally
+
+```bash
+npm install          # ensure express dependency is installed
+npm run build        # compile sdk into dist/
+npm run mock:server  # starts http://localhost:4020
+
+# After paying in the demo, copy the header and replay it against the mock
+curl http://localhost:4020/premium-resource \
+  -H "X-PAYMENT: <paste-header-here>"
+```
+
+The mock server lives at `examples/mock-resource-server.js` and mirrors how a resource server would decode, verify, and respond to the header.
+
 ## Project Structure
 
 ```
 stellarx402/
-├── src/              # Core SDK
+├── sdk/              # Core SDK source
 │   ├── types.ts      # TypeScript types
 │   ├── config.ts     # Network configs
 │   ├── utils.ts      # Helper functions
@@ -44,7 +58,7 @@ stellarx402/
 ## Core SDK Usage
 
 ```typescript
-import { getUSDCBalance, buildPaymentTransaction } from './src';
+import { getUSDCBalance, buildPaymentTransaction } from './sdk';
 
 // Check balance
 const balance = await getUSDCBalance(address, 'testnet');

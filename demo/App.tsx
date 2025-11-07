@@ -11,6 +11,7 @@ function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [paymentHeader, setPaymentHeader] = useState<string | null>(null);
 
   // Demo payment requirement - TESTNET ONLY
   // For demo: paying to yourself (self-payment) to avoid trustline issues
@@ -25,9 +26,10 @@ function App() {
     description: 'Access premium weather data API',
   };
 
-  const handlePaymentSuccess = (hash: string) => {
+  const handlePaymentSuccess = (hash: string, header?: string) => {
     console.log('Payment successful:', hash);
     setTxHash(hash);
+    setPaymentHeader(header ?? null);
     setPaymentComplete(true);
   };
 
@@ -39,9 +41,11 @@ function App() {
     setShowPaywall(false);
     setPaymentComplete(false);
     setTxHash(null);
+    setPaymentHeader(null);
   };
 
   const handleUnlockClick = () => {
+    setPaymentHeader(null);
     setShowPaywall(true);
   };
 
@@ -110,6 +114,63 @@ function App() {
               >
                 🔍 View on Stellar.Expert
               </a>
+            </div>
+          )}
+
+          {paymentHeader && (
+            <div style={{
+              background: '#fff',
+              borderRadius: '8px',
+              padding: '1rem',
+              marginBottom: '2rem',
+              border: '1px solid #dee2e6'
+            }}>
+              <div style={{
+                fontSize: '0.9rem',
+                color: '#6c757d',
+                marginBottom: '0.5rem',
+                fontWeight: 'bold'
+              }}>
+                X-PAYMENT Header (for resource server replay)
+              </div>
+              <textarea
+                value={paymentHeader}
+                readOnly
+                rows={3}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  fontFamily: 'Monaco, monospace',
+                  fontSize: '0.85rem',
+                  color: '#495057',
+                  padding: '0.75rem',
+                  borderRadius: '6px',
+                  border: '1px solid #ced4da',
+                  marginBottom: '0.75rem'
+                }}
+                onFocus={(event) => event.currentTarget.select()}
+              />
+              <button
+                onClick={() => {
+                  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    navigator.clipboard.writeText(paymentHeader).catch(() => {
+                      console.warn('Clipboard write failed');
+                    });
+                  }
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #20bf55 0%, #01baef 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.5rem 1.25rem',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  cursor: 'pointer'
+                }}
+              >
+                Copy Header
+              </button>
             </div>
           )}
 

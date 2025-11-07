@@ -25,6 +25,8 @@ try {
   execSync('node test/test-balance.js', { stdio: 'inherit' });
   console.log('\n');
   execSync('node test/test-transaction.js', { stdio: 'inherit' });
+  console.log('\n');
+  execSync('node test/test-x402.js', { stdio: 'inherit' });
 } catch (error) {
   console.error('\nTests failed');
   process.exit(1);

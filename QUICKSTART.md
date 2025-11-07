@@ -99,9 +99,20 @@ Option 2: Ask in [Stellar Discord](https://discord.gg/stellar) for test USDC
 ### For Developers
 
 Explore the code:
-- `src/` - Core SDK functions
+- `sdk/` - Core SDK functions
 - `demo/components/StellarPaywall.tsx` - Paywall component
 - `demo/hooks/useStellarWalletKit.ts` - Wallet connection
+
+### Verify the X-PAYMENT header locally
+
+```bash
+npm run build
+npm run mock:server
+curl http://localhost:4020/premium-resource \
+  -H "X-PAYMENT: <paste-header-here>"
+```
+
+The mock server (see `examples/mock-resource-server.js`) decodes the header, verifies the transaction via Horizon, and returns a demo JSON payload when the payment checks out.
 
 ### Customize
 
@@ -120,11 +131,7 @@ To use in production:
 4. Add proper error handling
 5. Test thoroughly!
 
-## Support
 
-- [Stellar Discord](https://discord.gg/stellar)
-- [Stellar Stack Exchange](https://stellar.stackexchange.com/)
-- [GitHub Issues](https://github.com/stellar)
 
 ---
 

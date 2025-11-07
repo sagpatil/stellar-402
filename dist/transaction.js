@@ -20,9 +20,9 @@ async function buildPaymentTransaction(params) {
     const usdcAsset = (0, utils_1.getUSDCAsset)(network);
     // Load source account
     const sourceAccount = await server.loadAccount(sourceAddress);
-    // Build transaction
+    // Build transaction with higher fee for testnet reliability
     const transactionBuilder = new stellar_sdk_1.TransactionBuilder(sourceAccount, {
-        fee: stellar_sdk_1.BASE_FEE,
+        fee: (parseInt(stellar_sdk_1.BASE_FEE) * 10).toString(), // 10x base fee for testnet
         networkPassphrase: config.networkPassphrase,
     });
     // Add payment operation

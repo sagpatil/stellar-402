@@ -1,4 +1,4 @@
-UI /**
+/**
  * Test balance fetching functionality
  */
 

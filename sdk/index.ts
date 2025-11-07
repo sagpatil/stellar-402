@@ -30,3 +30,19 @@ export {
   getTransactionDetails,
 } from './transaction';
 
+// x402 helpers
+export type {
+  StellarPaymentRequirement,
+  StellarPaymentPayload,
+  StellarPaymentProof,
+  StellarX402Network,
+} from './x402';
+export {
+  createStellarPaymentPayload,
+  encodeStellarPaymentHeader,
+  decodeStellarPaymentHeader,
+  validateRequirement,
+  validatePayload,
+  describeRequirement,
+} from './x402';
+
