@@ -12,6 +12,11 @@ A TypeScript SDK and React demo for building paywalls and micropayments using US
 - 🔒 **Type-safe** - Full TypeScript support
 - 🎨 **React components** - Pre-built paywall UI
 
+## Demo
+
+Watch the full paywall flow: [demo.mov](docs/resources/demo.mov)
+
+
 ## Quick Start
 
 ```bash
@@ -37,6 +42,14 @@ curl http://localhost:4020/premium-resource \
 ```
 
 The mock server lives at `examples/mock-resource-server.js` and mirrors how a resource server would decode, verify, and respond to the header.
+
+Example response:
+
+```bash
+curl http://localhost:4020/premium-resource \
+  -H "X-PAYMENT: eyJ4NDAyVmVyc2lvbiI6MSwic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoic3RlbGxhci10ZXN0bmV0IiwicGF5bG9hZCI6eyJ0cmFuc2FjdGlvbkhhc2giOiJmMWMzYWRhMTk4M2VkNGViYTVhYjkyNTkxZDM2ZGMzYmU3ZmFiMTNiNjFhZmE2MTMyMmYwMDM5NDE0NjgxZThjIiwibGVkZ2VyIjoxNDU3ODc1LCJtZW1vIjoieDQwMi1kZW1vLXBheW1lbnQiLCJzdWJtaXR0ZWRBdCI6IjIwMjUtMTEtMDdUMDQ6MzE6MzYuNTUwWiJ9fQ=="
+# => {"message":"Payment verified! Enjoy your premium resource.","transaction":{"hash":"f1c3ada1983ed4eba5ab92591d36dc3be7fab13b61afa61322f0039414681e8c","memo":"x402-demo-payment","link":"https://stellar.expert/explorer/testnet/tx/f1c3ada1983ed4eba5ab92591d36dc3be7fab13b61afa61322f0039414681e8c"},"content":{"temperature":"72°F","summary":"Premium weather data payload..."}}
+```
 
 ## Project Structure
 
@@ -113,18 +126,7 @@ The demo shows a complete payment flow:
 - Payment verification endpoint
 - Session management
 
-## Network Configuration
-
-**Testnet** (current):
-- Horizon: `https://horizon-testnet.stellar.org`
-- Network Passphrase: `Test SDF Network ; September 2015`
-- USDC Issuer: `GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5`
-
-**Mainnet** (future):
-- Horizon: `https://horizon.stellar.org`
-- Network Passphrase: `Public Global Stellar Network ; September 2015`
-- USDC Issuer: `GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN`
-
+#
 ## Scripts
 
 ```bash
