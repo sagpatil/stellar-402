@@ -1,0 +1,14 @@
+@import './paywall.css';
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at 20% 20%, #1a2557 0%, #090b1a 70%);
+  color: #f8f9fa;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+

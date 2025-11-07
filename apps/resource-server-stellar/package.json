@@ -1,0 +1,22 @@
+{
+  "name": "@stellar-x402/resource-server-stellar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsup src/server.ts --format esm,cjs"
+  },
+  "dependencies": {
+    "@stellar-x402/middleware-resource-stellar": "workspace:*",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.6.3"
+  }
+}

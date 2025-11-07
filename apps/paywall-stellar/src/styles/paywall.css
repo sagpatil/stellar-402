@@ -1,0 +1,372 @@
+/* Stellar Paywall styles (ported from demo app) */
+
+:root {
+  --primary-color: #7b3fe4;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --bg-color: #ffffff;
+  --border-color: #dee2e6;
+  --text-color: #212529;
+  --text-muted: #6c757d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.stellar-paywall {
+  background: var(--bg-color);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.paywall-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.paywall-header h2 {
+  margin: 0 0 0.5rem;
+  color: var(--text-color);
+  font-size: 1.75rem;
+}
+
+.paywall-header .description {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.payment-details {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.detail-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.detail-row .value {
+  font-weight: 500;
+  color: var(--text-color);
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #6a2fd1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 63, 228, 0.4);
+}
+
+.btn-secondary {
+  background: var(--secondary-color);
+  color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #856404;
+}
+
+.wallet-info {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.connected-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+.connected-badge .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success-color);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.wallet-info .address {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.wallet-info .balance {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.status-message {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.status-message p {
+  margin: 1rem 0 0;
+  color: var(--text-muted);
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-message {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--success-color);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1rem;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.success-message h3 {
+  margin: 0 0 0.5rem;
+  color: var(--success-color);
+}
+
+.success-message .tx-hash {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 1rem;
+}
+
+.explorer-link {
+  display: inline-block;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.explorer-link:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  color: #721c24;
+}
+
+.payment-header {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.payment-header textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  resize: vertical;
+}
+
+.status-info {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.wallet-kit-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.wallet-kit-button:hover {
+  background: #6a2fd1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 63, 228, 0.4);
+}
+
+.protected-content {
+  background: var(--bg-color);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.protected-content .success-badge {
+  display: inline-block;
+  background: var(--success-color);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.protected-content .content-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .stellar-paywall,
+  .protected-content {
+    padding: 1.5rem;
+  }
+
+  .paywall-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .btn-lg {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+

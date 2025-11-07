@@ -1,183 +1,92 @@
-# StellarX402
+# Stellar x402 GPT Workspace
 
-> x402 payment protocol implementation for Stellar blockchain
+This workspace hosts the Stellar extension for the x402 protocol, implemented under the `GPT implementation` tree to keep changes scoped and auditable. It contains the facilitator service, resource-server middleware, shared client utilities, and a paywall demo that exercise the complete 402 payment flow on Stellar testnet.
 
-A TypeScript SDK and React demo for building paywalls and micropayments using USDC on Stellar.
+## Packages & Apps
 
-## Features
+- `packages/facilitator-stellar`: Node/TypeScript service exposing `/supported`, `/verify`, and `/settle` endpoints against Stellar testnet.
+- `packages/client-stellar`: Shared TypeScript utilities for building Stellar `X-PAYMENT` payloads, wallet adapters, and Soroban helpers.
+- `packages/middleware-resource-stellar`: Resource-server middleware (Express/Hono) that orchestrates facilitator verification and settlement.
+- `apps/paywall-stellar`: Demo paywall web app showing wallet connect → pay → unlock flow.
+- `apps/resource-server-stellar`: Example Express resource server protecting `/weather/premium` with the middleware.
 
-- 💳 **Multi-wallet support** - Freighter, Albedo, xBull, Rabet, and more
-- 💰 **USDC payments** - Stablecoin transactions on Stellar testnet
-- ⚡ **Low fees** - Stellar's fast and cheap transactions
-- 🔒 **Type-safe** - Full TypeScript support
-- 🎨 **React components** - Pre-built paywall UI
+## Guiding References
 
-## Demo
-
-<video src="docs/resources/demo1.mp4" controls style="max-width: 100%; border-radius: 12px;">
-  Your browser does not support the video tag.
-  <a href="docs/resources/demo1.mp4">Download the demo video</a>.
-</video>
-
-<p align="center">
-  <img src="docs/resources/1.png" alt="Locked premium content screen" width="420" />
-  <img src="docs/resources/2.png" alt="Payment required details" width="420" />
-  <br/>
-  <img src="docs/resources/3.png" alt="Wallet connected and ready to pay" width="420" />
-  <img src="docs/resources/4.png" alt="Freighter confirmation dialog" width="420" />
-  <br/>
-  <img src="docs/resources/5.png" alt="Payment success and header output" width="640" />
-</p>
+- `docs/stellar_x402_design.md`: End-to-end design and architectural goals.
+- `docs/stellar_review_checklist.md`: Acceptance criteria ensuring parity with the Solana implementation.
+- `research/*`: Supporting notes on Stellar constraints, component mapping, and Solana parity targets.
 
 ## Quick Start
 
 ```bash
-# Install dependencies
-npm install
+cd "GPT implementation"
+pnpm install
 
-# Run the demo
-npm run demo
+# Terminal 1 – facilitator (port 4021)
+FEE_SPONSOR_SECRET=SA... \
+SUPPORTED_ASSETS="USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5,XLM" \
+pnpm --filter @stellar-x402/facilitator-stellar dev
+
+# Terminal 2 – resource server (port 4022)
+PAY_TO=G... \
+FEE_SPONSOR=G... \
+pnpm --filter @stellar-x402/resource-server-stellar dev
+
+# Terminal 3 – paywall UI (Vite, port 5173)
+pnpm --filter @stellar-x402/paywall-stellar dev
 ```
 
-Open http://localhost:3001 to see the paywall demo.
+Visit `http://localhost:5173/`, request the premium resource, connect a testnet wallet (Freighter, Albedo, etc.), and follow the on-screen prompts to complete the payment. The paywall encodes the signed transaction into an `X-PAYMENT` header, the resource server relays it to the facilitator, and the protected content unlocks after settlement.
 
-### Verify the `X-PAYMENT` header locally
+### Facilitator Internals
 
-```bash
-npm install           # ensure express dependency is installed
-npm run build         # compile sdk into dist/
-npm run verify:server # starts http://localhost:4020
-
-# After paying in the demo, copy the header and replay it against the verification server
-curl http://localhost:4020/premium-resource \
-  -H "X-PAYMENT: <paste-header-here>"
+```mermaid
+flowchart TD
+    A[Receive /settle request] --> B[Decode X-PAYMENT header]
+    B --> C[ensureNetworkPassphrase]
+    C --> D[ensureAssetSupported]
+    D --> E[decodeTransaction]
+    E --> F[ensurePaymentOperation]
+    F --> G[buildFeeBump transaction]
+    G --> H[submitTransaction to Horizon]
+    H --> I{Submission result}
+    I -- success --> J[Return tx hash + ledger]
+    I -- error --> K[Return error message]
 ```
 
-The verification server lives at `examples/verification-server.js` and mirrors how a resource server would decode, verify, and respond to the header.
+### End-to-End Sequence
 
-Example response:
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ResourceServer as Server
+    participant Facilitator
+    participant Stellar as Blockchain
 
-```bash
-curl http://localhost:4020/premium-resource \
-  -H "X-PAYMENT: eyJ4NDAyVmVyc2lvbiI6MSwic2NoZW1lIjoiZXhhY3QiLCJuZXR3b3JrIjoic3RlbGxhci10ZXN0bmV0IiwicGF5bG9hZCI6eyJ0cmFuc2FjdGlvbkhhc2giOiJmMWMzYWRhMTk4M2VkNGViYTVhYjkyNTkxZDM2ZGMzYmU3ZmFiMTNiNjFhZmE2MTMyMmYwMDM5NDE0NjgxZThjIiwibGVkZ2VyIjoxNDU3ODc1LCJtZW1vIjoieDQwMi1kZW1vLXBheW1lbnQiLCJzdWJtaXR0ZWRBdCI6IjIwMjUtMTEtMDdUMDQ6MzE6MzYuNTUwWiJ9fQ=="
-# => {"message":"Payment verified! Enjoy your premium resource.","transaction":{"hash":"f1c3ada1983ed4eba5ab92591d36dc3be7fab13b61afa61322f0039414681e8c","memo":"x402-demo-payment","link":"https://stellar.expert/explorer/testnet/tx/f1c3ada1983ed4eba5ab92591d36dc3be7fab13b61afa61322f0039414681e8c"},"content":{"temperature":"72°F","summary":"Premium weather data payload..."}}
+    Client->>ResourceServer: 1. GET /weather/premium
+    ResourceServer-->>Client: 2. 402 Payment Required + requirements
+    Client-->>Client: 3. User selects wallet & signs payment
+    Client->>ResourceServer: 4. GET /weather/premium with X-PAYMENT header
+    ResourceServer->>Facilitator: 5. POST /verify
+    Facilitator-->>ResourceServer: 6. Verification result (valid/invalid)
+    ResourceServer-->>ResourceServer: 7. (If valid) execute protected work
+    ResourceServer->>Facilitator: 8. POST /settle
+    Facilitator->>Stellar: 9. Submit fee-bump transaction
+    Stellar-->>Facilitator: 10. Ledger confirmation
+    Facilitator-->>ResourceServer: 11. Settled response (tx hash, ledger)
+    ResourceServer-->>Client: 12. 200 OK + protected payload + X-PAYMENT-RESPONSE
 ```
 
-## Project Structure
+## Documentation & References
 
-```
-stellarx402/
-├── sdk/              # Core SDK source
-│   ├── types.ts      # TypeScript types
-│   ├── config.ts     # Network configs
-│   ├── utils.ts      # Helper functions
-│   ├── balance.ts    # Balance checking
-│   └── transaction.ts # Transaction building
-├── demo/             # React demo app
-│   ├── components/   # UI components
-│   ├── hooks/        # React hooks
-│   └── App.tsx       # Main app
-└── test/             # Unit tests
-```
+- `docs/stellar_x402_runbook.md` – Operational guide covering setup, configuration, and troubleshooting.
+- `docs/stellar_x402_design.md` – End-to-end design and architectural goals.
+- `docs/stellar_review_checklist.md` – Acceptance criteria ensuring parity with the Solana implementation.
+- `research/*` – Supporting notes on Stellar constraints, component mapping, and Solana parity targets.
 
-## Core SDK Usage
+## Development Notes
 
-```typescript
-import { getUSDCBalance, buildPaymentTransaction } from './sdk';
+- Use `pnpm` from this directory (`pnpm install`, `pnpm run <script>`) to manage packages.
+- All transactions, fixtures, and tests target Stellar **testnet** by default.
+- Each implementation milestone should be verified on testnet (or mocks) before moving to the next task.
 
-// Check balance
-const balance = await getUSDCBalance(address, 'testnet');
-
-// Build payment
-const tx = await buildPaymentTransaction({
-  sourceAddress: 'G...',
-  destinationAddress: 'G...',
-  amount: '0.01',
-  network: 'testnet',
-  memo: 'payment-memo'
-});
-```
-
-## Demo App
-
-The demo shows a complete payment flow:
-
-1. **Landing page** - Shows locked premium content
-2. **Paywall** - Connect wallet and pay 0.01 USDC
-3. **Success** - View unlocked content and transaction on Stellar.Expert
-
-### Demo Features
-
-- Self-payment (pay to your own wallet for testing)
-- Real Stellar testnet transactions
-- Transaction verification on blockchain explorer
-- Multi-wallet connection modal
-
-## Getting Test USDC
-
-1. Go to [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
-2. Create a testnet account (get XLM)
-3. Add USDC trustline:
-   - Asset Code: `USDC`
-   - Issuer: `GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5`
-4. Get test USDC from a faucet or friend
-
-## Architecture
-
-### Current Implementation (Phase 1)
-
-✅ Client-side paywall UI  
-✅ Wallet connection (Stellar Wallets Kit)  
-✅ Transaction building and signing  
-✅ Direct submission to Stellar network  
-
-### Future (Phase 2)
-
-- Backend server with 402 middleware
-- Facilitator service for fee sponsorship
-- Payment verification endpoint
-- Session management
-
-#
-## Scripts
-
-```bash
-npm run build       # Build SDK and demo
-npm run demo        # Run demo app (port 3001)
-npm run test        # Run unit tests
-npm run dev         # Watch mode for development
-```
-
-## Tech Stack
-
-- **TypeScript** - Type safety
-- **React** - UI framework
-- **Vite** - Build tool
-- **Stellar SDK** - Blockchain interaction
-- **Stellar Wallets Kit** - Multi-wallet support
-
-## Contributing
-
-This is a demo implementation. For production use:
-
-1. Add backend server with 402 middleware
-2. Implement facilitator service
-3. Add proper error handling
-4. Implement session management
-5. Add payment verification
-6. Deploy to mainnet
-
-## License
-
-Apache-2.0
-
-## Resources
-
-- [Stellar Documentation](https://developers.stellar.org/)
-- [x402 Protocol](https://github.com/coinbase/x402)
-- [Stellar Wallets Kit](https://stellarwalletskit.dev/)
-- [Stellar.Expert Explorer](https://stellar.expert/)
-
----
-
-**Note:** This is a testnet demo. All transactions use test USDC and test XLM.
