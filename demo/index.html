@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StellarX402 - Stellar Payment Demo</title>
+    <meta name="description" content="Demo of x402 payment protocol on Stellar blockchain" />
+    <script>
+      // Polyfill for Node.js globals required by some wallet dependencies
+      window.global = window.globalThis;
+      window.process = { env: {} };
+      window.Buffer = window.Buffer || { isBuffer: () => false };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,32 @@
+{
+  "name": "stellarx402",
+  "version": "0.1.0",
+  "description": "x402 payment protocol for Stellar blockchain",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && npm run build:demo",
+    "build:demo": "vite build demo",
+    "test": "node test/run-tests.js",
+    "dev": "tsc --watch",
+    "demo": "vite demo --port 3001"
+  },
+  "keywords": ["x402", "stellar", "payments"],
+  "author": "Sagar Patel",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@stellar/stellar-sdk": "^12.3.0",
+    "@creit.tech/stellar-wallets-kit": "^1.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0"
+  }
+}
+
