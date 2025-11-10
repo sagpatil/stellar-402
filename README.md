@@ -90,6 +90,182 @@ sequenceDiagram
 11. **Facilitator returns settlement details** – it sends back the transaction hash, ledger, and success flag to the server.
 12. **Server responds to client** – the server returns `200 OK`, the protected resource payload, and an `X-PAYMENT-RESPONSE` header so the client can replay the payment if needed.
 
+## Facilitator API Reference
+
+The facilitator service in `packages/facilitator-stellar` exposes a minimal REST API that satisfies the x402 payment flow on Stellar testnet or mainnet. All endpoints return JSON and require `Content-Type: application/json` for requests with a body.
+
+### Base URLs
+
+- Development (default): `http://localhost:4021`
+- Environment variable overrides: `PORT` (fallback `4021`)
+
+### GET `/health`
+
+Operational status check.
+
+**Response**
+
+```json
+{
+  "status": "ok",
+  "service": "stellar-facilitator"
+}
+```
+
+### GET `/supported`
+
+Lists the payment kinds supported by this facilitator instance. The response is derived from the configuration and aligns with the x402 spec’s SupportedKinds schema.
+
+**Response**
+
+```json
+{
+  "kinds": [
+    {
+      "x402Version": 1,
+      "scheme": "exact",
+      "network": "stellar-testnet"
+    }
+  ]
+}
+```
+
+### POST `/verify`
+
+Validates a proposed payment against the requirements the resource server returned to the client. Use this before performing any protected work.
+
+- Ensures the payload matches the facilitator’s supported scheme/network.
+- Confirms the signed transaction aligns with `paymentRequirements` (amount, asset, destination, memo, time bounds, etc.).
+
+**Request Body**
+
+```json
+{
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "stellar-testnet",
+    "payload": {
+      "signature": "dbbf359a03dcfa9117e85892fecb90971652a531b4db3e7965f1fc7e871f799ef594f3b86a62a3b5a5ae0bc21ccf077bfaf15948eb685e9ee527a5005596ca04",
+      "invokeHostOpXDR": "AAAAAgAAAADKBZBfN0sKlKKXLqxlEPLp7Fz2a9XqwQKlBqcHPzQqaAAAAGQAAOzoAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAA"
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "stellar-testnet",
+    "resource": "https://example.com/api/resource",
+    "description": "Payment for API access",
+    "mimeType": "application/json",
+    "maxTimeoutSeconds": 3600,
+    "maxAmountRequired": "1000000",
+    "payTo": "GCQH2A2MCCW4TU5HKRTP35J2X4V2ZUMTCU75MRULENCFIUIKS4PJ7HHJ",
+    "asset": "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA"
+  }
+}
+```
+
+**Success Response**
+
+```json
+{
+  "isValid": true,
+  "payer": "GA42TVHEH5ZR2O3QB5WZ6JY2G6MCX326WC2O2CJC5UIRCUMDL5S4HPT3J"
+}
+```
+
+**Error Response**
+
+```json
+{
+  "isValid": false,
+  "invalidReason": "invalid_payload"
+}
+```
+
+Possible `invalidReason` values: `invalid_payload`, `invalid_x402_version`, `unsupported_scheme`, `invalid_network`, `unexpected_verify_error`.
+
+### POST `/settle`
+
+Submits the verified transaction to the Stellar network (wrapping it in a fee-bump that uses the facilitator’s fee sponsor keys).
+
+- Should be called after `/verify` succeeds and the resource server has generated the protected response.
+- Returns the result of submission to Horizon, including transaction hash and network.
+
+**Request Body**
+
+```json
+{
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "stellar-testnet",
+    "payload": {
+      "signature": "dbbf359a03dcfa9117e85892fecb90971652a531b4db3e7965f1fc7e871f799ef594f3b86a62a3b5a5ae0bc21ccf077bfaf15948eb685e9ee527a5005596ca04",
+      "invokeHostOpXDR": "AAAAAgAAAAA5qdTkP3MdO3APbZ8nGjeYK+9esLTtCSLtERFRg19lwwABblIAFxG2AAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAGAAAAAAAAAABUEXNXsBymnaP1a0CUFhS308Cjc6DDlrFIgm6SEg7LwEAAAAIdHJhbnNmZXIAAAADAAAAEgAAAAAAAAAAOanU5D9zHTtwD22fJxo3mCvvXrC07Qki7RERUYNfZcMAAAASAAAAAAAAAACgfQNMEK3J06dUZv31Or8rrNGTFT/WRosjRFRRCpcenwAAAAoAAAAAAAAAAAAAAAAAAAAUAAAAAQAAAAAAAAAAAAAAAVBFzV7Acpp2j9WtAlBYUt9PAo3Ogw5axSIJukhIOy8BAAAACHRyYW5zZmVyAAAAAwAAABIAAAAAAAAAADmp1OQ/cx07cA9tnycaN5gr716wtO0JIu0REVGDX2XDAAAAEgAAAAAAAAAAoH0DTBCtydOnVGb99Tq/K6zRkxU/1kaLI0RUUQqXHp8AAAAKAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAABAAAAAAAAAAEAAAAGAAAAAVBFzV7Acpp2j9WtAlBYUt9PAo3Ogw5axSIJukhIOy8BAAAAFAAAAAEAAAACAAAAAQAAAAA5qdTkP3MdO3APbZ8nGjeYK+9esLTtCSLtERFRg19lwwAAAAFVU0RDAAAAAEI+fQXy7K+/7BkrIVo/G+lq7bjY5wJUq+NBPgIH3layAAAAAQAAAACgfQNMEK3J06dUZv31Or8rrNGTFT/WRosjRFRRCpcenwAAAAFVU0RDAAAAAEI+fQXy7K+/7BkrIVo/G+lq7bjY5wJUq+NBPgIH3layAAQTzQAAAOgAAADoAAAAAAABbYoAAAAA"
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "stellar-testnet",
+    "resource": "https://example.com/api/resource",
+    "description": "Payment for API access",
+    "mimeType": "application/json",
+    "maxTimeoutSeconds": 3600,
+    "maxAmountRequired": "1000000",
+    "payTo": "GCQH2A2MCCW4TU5HKRTP35J2X4V2ZUMTCU75MRULENCFIUIKS4PJ7HHJ",
+    "asset": "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA"
+  }
+}
+```
+
+**Success Response**
+
+```json
+{
+  "success": true,
+  "payer": "GA42TVHEH5ZR2O3QB5WZ6JY2G6MCX326WC2O2CJC5UIRCUMDL5S4HPT3",
+  "transaction": "AAAAAgAAAADKBZBfN0sKlKKXLqxlEPLp7Fz2a9XqwQKlBqcHPzQqaAAAAGQAAOzoAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAA",
+  "network": "stellar-testnet"
+}
+```
+
+**Error Response**
+
+```json
+{
+  "success": false,
+  "errorReason": "invalid_payload",
+  "transaction": "",
+  "network": "stellar-testnet"
+}
+```
+
+Possible `errorReason` values: `invalid_payload`, `invalid_x402_version`, `unsupported_scheme`, `invalid_network`, `unexpected_settle_error`.
+
+### Curl Examples
+
+Verify a payment:
+
+```bash
+curl -X POST http://localhost:4021/verify \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+Settle a payment:
+
+```bash
+curl -X POST http://localhost:4021/settle \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+Check supported payment kinds:
+
+```bash
+curl http://localhost:4021/supported
+```
+
 ## Documentation & References
 
 - `docs/stellar_x402_runbook.md` – Operational guide covering setup, configuration, and troubleshooting.
