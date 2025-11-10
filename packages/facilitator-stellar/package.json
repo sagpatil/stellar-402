@@ -1,0 +1,37 @@
+{
+  "name": "@stellar-x402/facilitator-stellar",
+  "version": "0.1.0",
+  "description": "Stellar testnet facilitator for the x402 protocol (exact scheme).",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsx src/server.ts",
+    "lint": "eslint src --ext .ts",
+    "test": "tsx tests/verify.test.ts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^12.1.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2",
+    "pino-http": "^10.3.0",
+    "stellar-sdk": "^12.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.7.4",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "tsup": "^8.1.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.6.3"
+  }
+}
+

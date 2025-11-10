@@ -1,0 +1,27 @@
+{
+  "name": "@stellar-x402/paywall-stellar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "pnpm exec eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@creit.tech/stellar-wallets-kit": "1.0.0",
+    "@stellar-x402/client-stellar": "workspace:*",
+    "@stellar/stellar-sdk": "^13.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.3"
+  }
+}
+

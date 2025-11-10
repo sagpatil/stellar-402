@@ -1,0 +1,27 @@
+{
+  "name": "@stellar-x402/middleware-resource-stellar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "Express/Hono middleware for Stellar x402 resource servers",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "lint": "eslint src --ext .ts",
+    "test": "tsx tests/resource-middleware.test.ts"
+  },
+  "dependencies": {
+    "cross-fetch": "^4.0.0",
+    "express": "^4.19.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "supertest": "^6.3.4",
+    "tsup": "^8.5.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.6.3"
+  }
+}

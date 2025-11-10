@@ -1,0 +1,18 @@
+0 verbose cli /opt/homebrew/Cellar/node/24.3.0/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.4.2
+2 info using node@v24.3.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/sagar/code/Stellar/x402-1/GPT implementation/packages/facilitator-stellar/.npmrc
+5 silly config load:file:/Users/sagar/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm exec vitest run tests/verify.test.ts --threads false --pool forks --coverage.enabled false
+8 verbose argv "exec" "--" "vitest" "run" "tests/verify.test.ts" "--threads" "false" "--pool" "forks" "--coverage.enabled" "false"
+9 verbose logfile logs-max:10 dir:/Users/sagar/code/Stellar/x402-1/GPT implementation/packages/.npm-cache/_logs/2025-11-07T03_32_58_063Z-
+10 verbose logfile /Users/sagar/code/Stellar/x402-1/GPT implementation/packages/.npm-cache/_logs/2025-11-07T03_32_58_063Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose cwd /Users/sagar/code/Stellar/x402-1/GPT implementation/packages/facilitator-stellar
+13 verbose os Darwin 24.6.0
+14 verbose node v24.3.0
+15 verbose npm  v11.4.2
+16 verbose exit 1
+17 verbose code 1

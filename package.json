@@ -1,34 +1,21 @@
 {
-  "name": "stellarx402",
+  "name": "stellar-x402-gpt",
   "version": "0.1.0",
-  "description": "x402 payment protocol for Stellar blockchain",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
+  "description": "Workspace for the Stellar x402 implementation scoped to GPT contributions.",
+  "packageManager": "pnpm@9",
   "scripts": {
-    "build": "tsc && npm run build:demo",
-    "build:demo": "vite build demo",
-    "test": "node test/run-tests.js",
-    "dev": "tsc --watch",
-    "demo": "vite demo --port 3001",
-    "verify:server": "node examples/verification-server.js"
-  },
-  "keywords": ["x402", "stellar", "payments"],
-  "author": "Sagar Patel",
-  "license": "Apache-2.0",
-  "dependencies": {
-    "@stellar/stellar-sdk": "^12.3.0",
-    "@creit.tech/stellar-wallets-kit": "^1.0.0",
-    "express": "^4.19.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.0"
+    "@typescript-eslint/eslint-plugin": "^8.9.0",
+    "@typescript-eslint/parser": "^8.9.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "prettier": "^3.3.3"
   }
 }
 
